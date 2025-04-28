@@ -1,0 +1,139 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from sqlalchemy.orm import Session
+
+from application.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO, SubjectResponseDTO
+from application.use_cases.subjects.create_subject import CreateSubjectUseCase
+from application.use_cases.subjects.get_subject import GetSubjectUseCase
+from application.use_cases.subjects.update_subject import UpdateSubjectUseCase
+from application.use_cases.subjects.delete_subject import DeleteSubjectUseCase
+
+from domain.exceptions.cannot_create_exception import CannotCreateException
+from domain.exceptions.resource_not_found_exception import ResourceNotFoundException
+from domain.exceptions.cannot_update_resource_exception import CannotUpdateResourceException
+from domain.exceptions.cannot_delete_resource_exception import CannotDeleteResourceException
+from domain.utils.constants import UNEXPECTED_ERROR
+
+from infrastructure.db.database import get_db
+from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
+from infrastructure.mappers.subject_mappers import map_create_subject_dto_to_entity, map_update_subject_dto_to_entity
+
+router = APIRouter(prefix="/subjects", tags=["Subjects"])
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=SubjectResponseDTO)
+async def create_subject(
+    subject_data: CreateSubjectDTO,
+    db: Session = Depends(get_db)
+) -> SubjectResponseDTO:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = CreateSubjectUseCase(repo)
+        subject = use_case.execute(
+            map_create_subject_dto_to_entity(subject_data)
+        )
+        return subject
+    except CannotCreateException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+
+@router.get("/{subject_id}", status_code=status.HTTP_200_OK, response_model=SubjectResponseDTO)
+async def get_subject_by_id(
+    subject_id: str,
+    db: Session = Depends(get_db)
+) -> SubjectResponseDTO:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = GetSubjectUseCase(repo)
+        subject = use_case.execute_by_id(subject_id)
+        return subject
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[SubjectResponseDTO])
+async def get_all_subjects(
+    db: Session = Depends(get_db)
+) -> list[SubjectResponseDTO]:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = GetSubjectUseCase(repo)
+        subjects = use_case.execute_all()
+        return subjects
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+
+@router.put("/{subject_id}", status_code=status.HTTP_200_OK, response_model=SubjectResponseDTO)
+async def update_subject(
+    subject_id: str,
+    subject_data: UpdateSubjectDTO,
+    db: Session = Depends(get_db)
+) -> SubjectResponseDTO:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = UpdateSubjectUseCase(repo)
+        updated_subject = use_case.execute(
+            map_update_subject_dto_to_entity(subject_id, subject_data)
+        )
+        return updated_subject
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except CannotUpdateResourceException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+
+@router.delete("/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_subject(
+    subject_id: str,
+    db: Session = Depends(get_db)
+):
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = DeleteSubjectUseCase(repo)
+        use_case.execute(subject_id)
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except CannotDeleteResourceException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
