@@ -89,7 +89,7 @@ async def update_student(
     student_id: str,
     student_data: UpdateStudentDTO,
     db: Session = Depends(get_db)
-):
+) -> StudentResponseDTO:
     try:
         repo = StudentRepositoryImpl(db)
         use_case = UpdateStudentUseCase(repo)

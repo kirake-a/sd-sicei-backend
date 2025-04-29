@@ -32,7 +32,7 @@ class GradeRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, grade_id: int) -> None:
+    def delete(self, grade_id: int) -> bool:
         """
         To delete a grade by its ID from the repository.
         """
