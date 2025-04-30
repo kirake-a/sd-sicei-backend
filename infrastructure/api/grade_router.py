@@ -42,7 +42,7 @@ async def create_grade(
         grade = use_case.execute(
             map_create_grade_dto_to_entity(grade_data)
         )
-        return grade
+        return GradeResponseDTO.model_validate(grade)
     except NotEnoughArgumentsException as e:
         raise exception_detail_wrapper(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -77,7 +77,7 @@ async def get_grade_by_id(
         repo = GradeRepositoryImpl(db)
         use_case = GetGradeUseCase(repo)
         grade = use_case.execute_by_id(grade_id)
-        return grade
+        return GradeResponseDTO.model_validate(grade)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -97,8 +97,8 @@ async def get_grade_by_student_id(
     try:
         repo = GradeRepositoryImpl(db)
         use_case = GetGradeUseCase(repo)
-        grade = use_case.execute_by_student_id(student_id)
-        return grade
+        grades = use_case.execute_by_student_id(student_id)
+        return [GradeResponseDTO.model_validate(grade) for grade in grades]
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -118,8 +118,8 @@ async def get_grade_by_subject_id(
     try:
         repo = GradeRepositoryImpl(db)
         use_case = GetGradeUseCase(repo)
-        grade = use_case.execute_by_subject_id(subject_id)
-        return grade
+        grades = use_case.execute_by_subject_id(subject_id)
+        return [GradeResponseDTO.model_validate(grade) for grade in grades]
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -140,7 +140,7 @@ async def get_all_grade(
         repo = GradeRepositoryImpl(db)
         use_case = GetGradeUseCase(repo)
         grades = use_case.execute_all()
-        return grades
+        return [GradeResponseDTO.model_validate(grade) for grade in grades]
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -167,7 +167,7 @@ async def update_grade(
         grade = use_case.execute(
             map_update_grade_dto_to_entity(grade_id, grade_data)
         )
-        return grade
+        return GradeResponseDTO.model_validate(grade)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

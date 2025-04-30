@@ -6,8 +6,6 @@ from domain.exceptions.not_enough_arguments_exception import NotEnoughArgumentsE
 from domain.exceptions.resource_not_found_exception import ResourceNotFoundException
 from domain.exceptions.cannot_create_exception import CannotCreateException
 
-from application.schemas.grades_schema import GradeResponseDTO
-
 class CreateGradeUseCase:
     def __init__(
         self,
@@ -19,7 +17,7 @@ class CreateGradeUseCase:
         self.student_repository = student_repository
         self.subject_repository = subject_repository
 
-    def execute(self, grade_data: Grade) -> GradeResponseDTO:
+    def execute(self, grade_data: Grade) -> Grade:
 
         if not grade_data.student_id or not grade_data.subject_id:
             raise NotEnoughArgumentsException("Student ID and Course ID are required.")
@@ -33,4 +31,4 @@ class CreateGradeUseCase:
         if not created_grade:
             raise CannotCreateException("Cannot create grade")
         
-        return GradeResponseDTO.model_validate(created_grade)
+        return created_grade
