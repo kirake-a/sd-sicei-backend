@@ -4,13 +4,11 @@ from domain.entities.student import Student
 from domain.repositories.student_repository import StudentRepository
 from domain.exceptions.cannot_create_exception import CannotCreateException
 
-from application.schemas.student_schema import StudentResponseDTO
-
 class CreateStudentUseCase:
     def __init__(self, repository: StudentRepository):
         self.repository = repository
 
-    def execute(self, student_data: Student) -> StudentResponseDTO:
+    def execute(self, student_data: Student) -> Student:
         student_data.id = self.generate_student_id()
 
         created_student = self.repository.create(student_data)
@@ -18,7 +16,7 @@ class CreateStudentUseCase:
         if not created_student:
             raise CannotCreateException("Cannot create student")
             
-        return StudentResponseDTO.model_validate(created_student)
+        return created_student
     
     def generate_student_id(self, year: int = 2025) -> str:
         prefix = f"A{str(year)[-2:]}00"

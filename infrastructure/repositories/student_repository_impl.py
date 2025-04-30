@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 
+from typing import List
+
 from domain.entities.student import Student
 from domain.repositories.student_repository import StudentRepository
 
@@ -34,7 +36,7 @@ class StudentRepositoryImpl(StudentRepository):
         
         return map_student_model_to_entity(student_model)
 
-    def get_all(self) -> list[Student]:
+    def get_all(self) -> List[Student]:
         students_model = self.db.query(StudentModel).all()
         return [map_student_model_to_entity(student_model) for student_model in students_model]
 
