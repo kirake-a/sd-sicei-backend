@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from typing import List
+
 from sqlalchemy.orm import Session
 
 from infrastructure.db.database import get_db
@@ -87,10 +89,53 @@ async def get_grade_by_id(
             detail=UNEXPECTED_ERROR + str(e)
         )
     
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[GradeResponseDTO])
+@router.get("/student/{student_id}", status_code=status.HTTP_200_OK, response_model=List[GradeResponseDTO])
+async def get_grade_by_student_id(
+    student_id: str,
+    db: Session = Depends(get_db)
+) -> List[GradeResponseDTO]:
+    try:
+        repo = GradeRepositoryImpl(db)
+        use_case = GetGradeUseCase(repo)
+        grade = use_case.execute_by_student_id(student_id)
+        return grade
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:  
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+    
+@router.get("/subject/{subject_id}", status_code=status.HTTP_200_OK, response_model=List[GradeResponseDTO])
+async def get_grade_by_subject_id(
+    subject_id: str,
+    db: Session = Depends(get_db)
+) -> List[GradeResponseDTO]:
+    try:
+        repo = GradeRepositoryImpl(db)
+        use_case = GetGradeUseCase(repo)
+        grade = use_case.execute_by_subject_id(subject_id)
+        return grade
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+
+    
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[GradeResponseDTO])
 async def get_all_grade(
     db: Session = Depends(get_db)
-) -> list[GradeResponseDTO]:
+) -> List[GradeResponseDTO]:
     try:
         repo = GradeRepositoryImpl(db)
         use_case = GetGradeUseCase(repo)

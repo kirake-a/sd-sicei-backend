@@ -44,3 +44,17 @@ class GradeRepository(ABC):
         To check if a grade exists in the repository.
         """
         pass
+
+    @abstractmethod
+    def get_by_student_id(self, student_id: str) -> List[Grade] | None:
+        """
+        To get a student by their ID from the repository.
+        """
+        pass
+
+    @abstractmethod
+    def get_by_subject_id(self, subject_id: str) -> List[Grade] | None:
+        """
+        To get a subject by its ID from the repository.
+        """
+        pass
