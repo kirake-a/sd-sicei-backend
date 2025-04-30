@@ -24,3 +24,19 @@ class GetGradeUseCase:
             raise ResourceNotFoundException("No grades found")
         
         return [GradeResponseDTO.model_validate(grade) for grade in grades_obtained]
+    
+    def execute_by_student_id(self, student_id: str) -> List[GradeResponseDTO]:
+        grade_obtained = self.repository.get_by_student_id(student_id)
+        # TO CONSIDER
+        if not grade_obtained:
+            raise ResourceNotFoundException(f"No grades found for student with ID '{student_id}'")
+        
+        return [GradeResponseDTO.model_validate(grade) for grade in grade_obtained]
+    
+    def execute_by_subject_id(self, subject_id: str) -> List[GradeResponseDTO]:
+        grade_obtained = self.repository.get_by_subject_id(subject_id)
+        # TO CONSIDER
+        if not grade_obtained:
+            raise ResourceNotFoundException(f"No grades found for subject with ID '{subject_id}'")
+        
+        return [GradeResponseDTO.model_validate(grade) for grade in grade_obtained]

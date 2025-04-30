@@ -70,3 +70,19 @@ class GradeRepositoryImpl(GradeRepository):
     def exists(self, grade_id: int) -> bool:
         student_model = self.db.query(GradeModel).filter(GradeModel.id == grade_id).first()
         return student_model is not None
+    
+    def get_by_student_id(self, student_id: str) -> List[Grade] | None:
+        grade_models = self.db.query(GradeModel).filter(GradeModel.student_id == student_id).all()
+
+        if not grade_models:
+            return None
+        
+        return [map_grade_model_to_entity(grade_model) for grade_model in grade_models]
+    
+    def get_by_subject_id(self, subject_id) -> List[Grade] | None:
+        grade_models = self.db.query(GradeModel).filter(GradeModel.subject_id == subject_id).all()
+
+        if not grade_models:
+            return None
+        
+        return [map_grade_model_to_entity(grade_model) for grade_model in grade_models]
