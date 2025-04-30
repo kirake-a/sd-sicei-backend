@@ -1,7 +1,6 @@
 from domain.entities.grade import Grade
 
-from application.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO
-
+from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO
 from infrastructure.db.models import GradeModel
 
 def map_create_grade_dto_to_entity(grade_dto: CreateGradeDTO) -> Grade:

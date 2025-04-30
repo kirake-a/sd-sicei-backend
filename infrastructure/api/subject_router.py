@@ -4,7 +4,6 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from application.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO, SubjectResponseDTO
 from application.use_cases.subjects.create_subject import CreateSubjectUseCase
 from application.use_cases.subjects.get_subject import GetSubjectUseCase
 from application.use_cases.subjects.update_subject import UpdateSubjectUseCase
@@ -18,6 +17,7 @@ from domain.utils.constants import UNEXPECTED_ERROR
 
 from infrastructure.db.database import get_db
 from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
+from infrastructure.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO, SubjectResponseDTO
 from infrastructure.mappers.subject_mappers import map_create_subject_dto_to_entity, map_update_subject_dto_to_entity
 
 router = APIRouter(prefix="/subjects", tags=["Subjects"])

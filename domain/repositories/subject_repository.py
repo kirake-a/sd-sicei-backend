@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-from domain.entities.subject import Subject
+
 from typing import List
+
+from domain.entities.subject import Subject
 
 class SubjectRepository(ABC):
     @abstractmethod

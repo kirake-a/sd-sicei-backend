@@ -4,7 +4,6 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from application.schemas.student_schema import CreateStudentDTO, UpdateStudentDTO, StudentResponseDTO
 from application.use_cases.students.create_student import CreateStudentUseCase
 from application.use_cases.students.get_student import GetStudentUseCase
 from application.use_cases.students.update_student import UpdateStudentUseCase
@@ -17,6 +16,7 @@ from domain.exceptions.cannot_delete_resource_exception import CannotDeleteResou
 from domain.utils.constants import UNEXPECTED_ERROR
 
 from infrastructure.repositories.student_repository_impl import StudentRepositoryImpl
+from infrastructure.schemas.student_schema import CreateStudentDTO, UpdateStudentDTO, StudentResponseDTO
 from infrastructure.mappers.student_mappers import map_create_student_dto_to_entity, map_update_student_dto_to_entity
 from infrastructure.db.database import get_db
 

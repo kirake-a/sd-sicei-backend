@@ -9,8 +9,8 @@ from infrastructure.repositories.grade_repository_impl import GradeRepositoryImp
 from infrastructure.repositories.student_repository_impl import StudentRepositoryImpl
 from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
 from infrastructure.mappers.grade_mappers import map_create_grade_dto_to_entity, map_update_grade_dto_to_entity
+from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO
 
-from application.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO
 from application.use_cases.grades.create_grade import CreateGradeUseCase
 from application.use_cases.grades.get_grade import GetGradeUseCase
 from application.use_cases.grades.delete_grade import DeleteGradeUseCase
