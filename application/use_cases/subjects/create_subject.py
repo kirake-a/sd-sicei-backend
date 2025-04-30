@@ -3,15 +3,12 @@ import uuid
 from domain.entities.subject import Subject
 from domain.repositories.subject_repository import SubjectRepository
 from domain.exceptions.cannot_create_exception import CannotCreateException
-from domain.exceptions.resource_already_exists_exception import ResourceAlreadyExistsException
-
-from application.schemas.subject_schema import SubjectResponseDTO
 
 class CreateSubjectUseCase:
     def __init__(self, repository: SubjectRepository):
         self.repository = repository
 
-    def execute(self, subject_data: Subject) -> SubjectResponseDTO:
+    def execute(self, subject_data: Subject) -> Subject:
         subject_data.id = self.generate_subject_id()
 
         created_subject = self.repository.create(subject_data)
@@ -19,7 +16,7 @@ class CreateSubjectUseCase:
         if not created_subject:
             raise CannotCreateException("Cannot create subject successfully")
         
-        return SubjectResponseDTO.model_validate(created_subject)
+        return created_subject
         
     def generate_subject_id(self) -> str:
         new_id = str(uuid.uuid4())

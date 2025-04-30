@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from typing import List
+
 from sqlalchemy.orm import Session
 
 from application.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO, SubjectResponseDTO
@@ -31,7 +33,7 @@ async def create_subject(
         subject = use_case.execute(
             map_create_subject_dto_to_entity(subject_data)
         )
-        return subject
+        return SubjectResponseDTO.model_validate(subject)
     except CannotCreateException as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -52,7 +54,7 @@ async def get_subject_by_id(
         repo = SubjectRepositoryImpl(db)
         use_case = GetSubjectUseCase(repo)
         subject = use_case.execute_by_id(subject_id)
-        return subject
+        return SubjectResponseDTO.model_validate(subject)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -67,12 +69,12 @@ async def get_subject_by_id(
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[SubjectResponseDTO])
 async def get_all_subjects(
     db: Session = Depends(get_db)
-) -> list[SubjectResponseDTO]:
+) -> List[SubjectResponseDTO]:
     try:
         repo = SubjectRepositoryImpl(db)
         use_case = GetSubjectUseCase(repo)
         subjects = use_case.execute_all()
-        return subjects
+        return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -96,7 +98,7 @@ async def update_subject(
         updated_subject = use_case.execute(
             map_update_subject_dto_to_entity(subject_id, subject_data)
         )
-        return updated_subject
+        return SubjectResponseDTO.model_validate(updated_subject)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
