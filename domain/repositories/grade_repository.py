@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-from domain.entities.grade import Grade
+
 from typing import List
+
+from domain.entities.grade import Grade
 
 class GradeRepository(ABC):
     @abstractmethod

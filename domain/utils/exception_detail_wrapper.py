@@ -1,7 +1,8 @@
 from fastapi import HTTPException
+
 from datetime import datetime, timezone
 
-from application.schemas.error_schema import ErrorDetail
+from infrastructure.schemas.error_schema import ErrorDetail
 
 def exception_detail_wrapper(
     status_code: int,

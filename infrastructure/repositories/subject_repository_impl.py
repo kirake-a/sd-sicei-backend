@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 
+from typing import List
+
 from domain.entities.subject import Subject
 from domain.repositories.subject_repository import SubjectRepository
 
@@ -34,7 +36,7 @@ class SubjectRepositoryImpl(SubjectRepository):
         
         return map_subject_model_to_entity(subject_model)
 
-    def get_all(self) -> list[Subject]:
+    def get_all(self) -> List[Subject]:
         subjects_model = self.db.query(SubjectModel).all()
         return [map_subject_model_to_entity(subject_model) for subject_model in subjects_model]
 
