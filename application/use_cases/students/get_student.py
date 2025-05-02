@@ -1,3 +1,4 @@
+from typing import Optional
 from domain.repositories.student_repository import StudentRepository
 from domain.exceptions.resource_not_found_exception import ResourceNotFoundException
 from domain.entities.student import Student
@@ -14,8 +15,19 @@ class GetStudentUseCase:
         
         return student_obtained
     
-    def execute_all(self) -> list[Student]:
-        students_obtained = self.repository.get_all()
+    def execute_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> list[Student]:
+        students_obtained = self.repository.get_all(
+            page_size=page_size,
+            page=page,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
 
         if not students_obtained:
             raise ResourceNotFoundException("No students found")
