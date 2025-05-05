@@ -150,11 +150,6 @@ async def get_all_grade(
             sort_order=sort_order
         )
         return [GradeResponseDTO.model_validate(grade) for grade in grades]
-    except ResourceNotFoundException as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

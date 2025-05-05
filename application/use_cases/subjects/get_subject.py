@@ -29,8 +29,5 @@ class GetSubjectUseCase:
             sort_field=sort_field,
             sort_order=sort_order
         )
-
-        if not subjects_obtained:
-            raise ResourceNotFoundException("No subjects found")
         
         return subjects_obtained
