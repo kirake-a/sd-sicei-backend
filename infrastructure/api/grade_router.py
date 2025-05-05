@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 
-from typing import List
+from typing import Annotated, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -134,12 +134,21 @@ async def get_grade_by_subject_id(
     
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[GradeResponseDTO])
 async def get_all_grade(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
 ) -> List[GradeResponseDTO]:
     try:
         repo = GradeRepositoryImpl(db)
         use_case = GetGradeUseCase(repo)
-        grades = use_case.execute_all()
+        grades = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
         return [GradeResponseDTO.model_validate(grade) for grade in grades]
     except ResourceNotFoundException as e:
         raise HTTPException(

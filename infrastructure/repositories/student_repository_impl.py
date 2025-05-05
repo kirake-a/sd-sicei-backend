@@ -6,7 +6,7 @@ from domain.entities.student import Student
 from domain.repositories.student_repository import StudentRepository
 
 from infrastructure.db.models import StudentModel
-from infrastructure.utils.sort_fields import ALLOWED_STUDENT_SORT_FIELDS
+from infrastructure.utils.sort_fields import ALLOWED_STUDENT_SORT_FIELDS, ALLOWED_SORT_ORDERS
 from infrastructure.mappers.student_mappers import map_student_entity_to_model, map_student_model_to_entity
 
 class StudentRepositoryImpl(StudentRepository):
@@ -47,9 +47,9 @@ class StudentRepositoryImpl(StudentRepository):
         query = self.db.query(StudentModel)
 
         if sort_field in ALLOWED_STUDENT_SORT_FIELDS:
-            if sort_order == "asc":
+            if sort_order in ALLOWED_SORT_ORDERS and sort_order == "asc":
                 query = query.order_by(getattr(StudentModel, sort_field).asc())
-            elif sort_order == "desc":
+            elif sort_order in ALLOWED_SORT_ORDERS and sort_order == "desc":
                 query = query.order_by(getattr(StudentModel, sort_field).desc())
         
         query = query.offset((page - 1) * page_size).limit(page_size)

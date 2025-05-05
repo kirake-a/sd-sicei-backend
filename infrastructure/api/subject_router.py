@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 
-from typing import List
+from typing import Annotated, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -68,12 +68,21 @@ async def get_subject_by_id(
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[SubjectResponseDTO])
 async def get_all_subjects(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
 ) -> List[SubjectResponseDTO]:
     try:
         repo = SubjectRepositoryImpl(db)
         use_case = GetSubjectUseCase(repo)
-        subjects = use_case.execute_all()
+        subjects = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
         return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
     except ResourceNotFoundException as e:
         raise HTTPException(
