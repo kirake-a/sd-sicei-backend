@@ -84,11 +84,6 @@ async def get_all_students(
             sort_order=sort_order
         )
         return [StudentResponseDTO.model_validate(student) for student in students]
-    except ResourceNotFoundException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

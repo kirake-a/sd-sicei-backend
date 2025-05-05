@@ -28,8 +28,5 @@ class GetStudentUseCase:
             sort_field=sort_field,
             sort_order=sort_order
         )
-
-        if not students_obtained:
-            raise ResourceNotFoundException("No students found")
         
         return students_obtained

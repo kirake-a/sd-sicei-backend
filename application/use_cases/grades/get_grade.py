@@ -29,9 +29,6 @@ class GetGradeUseCase:
             sort_field=sort_field,
             sort_order=sort_order
         )
-
-        if not grades_obtained:
-            raise ResourceNotFoundException("No grades found")
         
         return grades_obtained
     

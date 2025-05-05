@@ -84,11 +84,6 @@ async def get_all_subjects(
             sort_order=sort_order
         )
         return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
-    except ResourceNotFoundException as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
