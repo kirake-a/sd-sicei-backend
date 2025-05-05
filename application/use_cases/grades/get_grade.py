@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from domain.repositories.grade_repository import GradeRepository
 from domain.entities.grade import Grade
@@ -16,8 +16,19 @@ class GetGradeUseCase:
         
         return grade_obtained
     
-    def execute_all(self) -> List[Grade]:
-        grades_obtained = self.repository.get_all()
+    def execute_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Grade]:
+        grades_obtained = self.repository.get_all(
+            page_size=page_size,
+            page=page,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
 
         if not grades_obtained:
             raise ResourceNotFoundException("No grades found")

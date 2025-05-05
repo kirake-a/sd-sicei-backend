@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from typing import List
+from typing import List, Optional
 
 from domain.entities.grade import Grade
 
@@ -20,7 +20,13 @@ class GradeRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> List[Grade]:
+    def get_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Grade]:
         """
         To get all grades from the repository.
         """

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from domain.entities.subject import Subject
 from domain.repositories.subject_repository import SubjectRepository
@@ -16,8 +16,19 @@ class GetSubjectUseCase:
         
         return subject_obtained
     
-    def execute_all(self) -> List[Subject]:
-        subjects_obtained = self.respository.get_all()
+    def execute_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Subject]:
+        subjects_obtained = self.respository.get_all(
+            page_size=page_size,
+            page=page,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
 
         if not subjects_obtained:
             raise ResourceNotFoundException("No subjects found")

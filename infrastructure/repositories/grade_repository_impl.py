@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 
-from typing import List
+from typing import List, Optional
 
 from domain.entities.grade import Grade
 from domain.repositories.grade_repository import GradeRepository
 
 from infrastructure.db.models import GradeModel
+from infrastructure.utils.sort_fields import ALLOWED_GRADES_SORT_FIELDS, ALLOWED_SORT_ORDERS
 from infrastructure.mappers.grade_mappers import map_grade_entity_to_model, map_grade_model_to_entity
 
 class GradeRepositoryImpl(GradeRepository):
@@ -33,8 +34,24 @@ class GradeRepositoryImpl(GradeRepository):
         
         return map_grade_model_to_entity(grade_model)
 
-    def get_all(self) -> List[Grade]:
-        students_model = self.db.query(GradeModel).all()
+    def get_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Grade]:
+        query = self.db.query(GradeModel)
+
+        if sort_field in ALLOWED_GRADES_SORT_FIELDS:
+            if sort_order in ALLOWED_SORT_ORDERS and sort_order == "asc":
+                query = query.order_by(getattr(GradeModel, sort_field).asc())
+            elif sort_order in ALLOWED_SORT_ORDERS and sort_order == "desc":
+                query = query.order_by(getattr(GradeModel, sort_field).desc())
+                
+        query = query.offset((page - 1) * page_size).limit(page_size)
+        students_model = query.all()
+
         return [map_grade_model_to_entity(grade_model) for grade_model in students_model]
 
     def update(self, grade: Grade) -> Grade | None:
