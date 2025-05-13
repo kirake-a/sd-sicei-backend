@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from typing import List
+from typing import List, Optional
 
 from domain.entities.subject import Subject
 
@@ -21,7 +21,13 @@ class SubjectRepository(ABC):
        pass
 
     @abstractmethod
-    def get_all(self) -> List[Subject]:
+    def get_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Subject]:
         """To retrieve all subject records."""
         pass
 

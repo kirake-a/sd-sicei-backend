@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from typing import List
+from typing import List, Optional
 
 from domain.entities.student import Student
 
@@ -21,7 +21,13 @@ class StudentRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> List[Student]:
+    def get_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Student]:
         """To retrieve all student records."""
         pass
 

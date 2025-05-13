@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 
-from typing import List
+from typing import Annotated, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -90,18 +90,22 @@ async def get_student_by_semester(
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[StudentResponseDTO])
 async def get_all_students(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
 ) -> List[StudentResponseDTO]:
     try:
         repo = StudentRepositoryImpl(db)
         use_case = GetStudentUseCase(repo)
-        students = use_case.execute_all()
-        return [StudentResponseDTO.model_validate(student) for student in students]
-    except ResourceNotFoundException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+        students = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
         )
+        return [StudentResponseDTO.model_validate(student) for student in students]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

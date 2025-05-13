@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 
-from typing import List
+from typing import List, Optional
 
 from domain.entities.subject import Subject
 from domain.repositories.subject_repository import SubjectRepository
 
 from infrastructure.db.models import SubjectModel
+from infrastructure.utils.sort_fields import ALLOWED_SUBJECT_SORT_FIELDS, ALLOWED_SORT_ORDERS
 from infrastructure.mappers.subject_mappers import map_subject_entity_to_model, map_subject_model_to_entity
 
 class SubjectRepositoryImpl(SubjectRepository):
@@ -40,8 +41,24 @@ class SubjectRepositoryImpl(SubjectRepository):
         subjects_model = self.db.query(SubjectModel).filter(SubjectModel.semester == subjects_semester).first()
         return [map_subject_model_to_entity(subject_model) for subject_model in subjects_model]
 
-    def get_all(self) -> List[Subject]:
-        subjects_model = self.db.query(SubjectModel).all()
+    def get_all(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[Subject]:
+        query = self.db.query(SubjectModel)
+
+        if sort_field in ALLOWED_SUBJECT_SORT_FIELDS:
+            if sort_order in ALLOWED_SORT_ORDERS and sort_order == "asc":
+                query = query.order_by(getattr(SubjectModel, sort_field).asc())
+            elif sort_order in ALLOWED_SORT_ORDERS and sort_order == "desc":
+                query = query.order_by(getattr(SubjectModel, sort_field).desc())
+
+        query = query.offset((page - 1) * page_size).limit(page_size)
+        subjects_model = query.all()
+
         return [map_subject_model_to_entity(subject_model) for subject_model in subjects_model]
 
     def update(self, subject: Subject) -> Subject | None:
