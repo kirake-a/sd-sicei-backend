@@ -14,6 +14,14 @@ class GetStudentUseCase:
         
         return student_obtained
     
+    def execute_by_semester(self, students_semester: int) -> list[Student]:
+        students_obtained = self.repository.get_by_semester(students_semester)
+
+        if not students_obtained:
+            raise ResourceNotFoundException("No students fount by semester")
+        
+        return students_obtained
+    
     def execute_all(self) -> list[Student]:
         students_obtained = self.repository.get_all()
 

@@ -36,6 +36,10 @@ class StudentRepositoryImpl(StudentRepository):
         
         return map_student_model_to_entity(student_model)
 
+    def get_by_semester(self, students_semester: int) -> List[Student]:
+        students_model = self.db.query(StudentModel).filter(StudentModel.semester == students_semester).all()
+        return [map_student_model_to_entity(student_model) for student_model in students_model]
+
     def get_all(self) -> List[Student]:
         students_model = self.db.query(StudentModel).all()
         return [map_student_model_to_entity(student_model) for student_model in students_model]
