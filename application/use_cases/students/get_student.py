@@ -19,7 +19,7 @@ class GetStudentUseCase:
         students_obtained = self.repository.get_by_semester(students_semester)
 
         if not students_obtained:
-            raise ResourceNotFoundException("No students fount by semester")
+            raise ResourceNotFoundException("No students found by semester")
         
         return students_obtained
         

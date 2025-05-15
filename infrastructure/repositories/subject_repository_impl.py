@@ -38,7 +38,7 @@ class SubjectRepositoryImpl(SubjectRepository):
         return map_subject_model_to_entity(subject_model)
 
     def get_by_semester(self, subjects_semester: int) -> List[Subject]:
-        subjects_model = self.db.query(SubjectModel).filter(SubjectModel.semester == subjects_semester).first()
+        subjects_model = self.db.query(SubjectModel).filter(SubjectModel.semester == subjects_semester).all()
         return [map_subject_model_to_entity(subject_model) for subject_model in subjects_model]
 
     def get_all(
