@@ -14,6 +14,11 @@ class StudentRepository(ABC):
     def get_by_id(self, student_id: str) -> Student | None:
         """To retrieve a student record by its ID."""
         pass
+    
+    @abstractmethod
+    def get_by_semester(self, students_semester: int) ->List[Student]:
+        """To retrieve all students record by its semester."""
+        pass
 
     @abstractmethod
     def get_all(

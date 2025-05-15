@@ -65,6 +65,28 @@ async def get_student_by_id(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=UNEXPECTED_ERROR + str(e)
         )
+    
+@router.get("/semester/{students_semester}", status_code=status.HTTP_200_OK, response_model=StudentResponseDTO)
+async def get_student_by_semester(
+    students_semester: int,
+    db: Session = Depends(get_db)
+) -> StudentResponseDTO:
+    try:
+        repo = StudentRepositoryImpl(db)
+        use_case = GetStudentUseCase(repo)
+        students = use_case.execute_by_semester(students_semester)
+        return [StudentResponseDTO.model_validate(student) for student in students]
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[StudentResponseDTO])
 async def get_all_students(

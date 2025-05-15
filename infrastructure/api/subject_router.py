@@ -66,6 +66,27 @@ async def get_subject_by_id(
             detail=UNEXPECTED_ERROR + str(e)
         )
 
+@router.get("/semester/{subjects_semester}", status_code=status.HTTP_200_OK, response_model=SubjectResponseDTO)
+async def get_subject_by_semester(
+    subjects_semester: int,
+    db: Session = Depends(get_db)
+) -> SubjectResponseDTO:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = GetSubjectUseCase(repo)
+        subjects = use_case.execute_by_semester(subjects_semester)
+        return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+            
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[SubjectResponseDTO])
 async def get_all_subjects(
     db: Session = Depends(get_db),
