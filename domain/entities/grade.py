@@ -6,3 +6,9 @@ class Grade:
     student_id: str
     subject_id: str
     value: float
+
+@dataclass
+class GradeToShow:
+    id: int
+    subject: str
+    value: float

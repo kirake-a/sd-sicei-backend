@@ -9,7 +9,7 @@ from infrastructure.repositories.grade_repository_impl import GradeRepositoryImp
 from infrastructure.repositories.student_repository_impl import StudentRepositoryImpl
 from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
 from infrastructure.mappers.grade_mappers import map_create_grade_dto_to_entity, map_update_grade_dto_to_entity
-from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO
+from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO, GradeToShowResponseDTO
 from infrastructure.schemas.student_schema import StudentResponseDTO
 
 from application.use_cases.grades.create_grade import CreateGradeUseCase
@@ -90,6 +90,16 @@ async def get_all_students(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=UNEXPECTED_ERROR + str(e)
         )
+    
+@router.get("/students/{student_id}", status_code=status.HTTP_200_OK, response_model=List[GradeToShowResponseDTO])
+async def get_student_grades(
+    student_id: str,
+    db: Session = Depends(get_db),
+) -> List[GradeToShowResponseDTO]:
+    repo = GradeRepositoryImpl(db)
+    use_case = GetGradeUseCase(repo)
+    students = use_case.execute_get_grades_by_student_id(student_id)
+    return [GradeToShowResponseDTO.model_validate(grade) for grade in students]
 
 @router.get("/{grade_id}", status_code=status.HTTP_200_OK, response_model=GradeResponseDTO)
 async def get_grade_by_id(
