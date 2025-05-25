@@ -17,7 +17,7 @@ class SubjectRepository(ABC):
 
     @abstractmethod
     def get_by_semester(self, subjects_semester: int) -> List[Subject]:
-       """To retrieve all subjects record by its senmester."""
+       """To retrieve all subjects record by its semester."""
        pass
 
     @abstractmethod

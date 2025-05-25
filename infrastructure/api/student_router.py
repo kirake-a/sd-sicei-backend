@@ -66,11 +66,11 @@ async def get_student_by_id(
             detail=UNEXPECTED_ERROR + str(e)
         )
     
-@router.get("/semester/{students_semester}", status_code=status.HTTP_200_OK, response_model=StudentResponseDTO)
-async def get_student_by_semester(
+@router.get("/semester/{students_semester}", status_code=status.HTTP_200_OK, response_model=List[StudentResponseDTO])
+async def get_students_by_semester(
     students_semester: int,
     db: Session = Depends(get_db)
-) -> StudentResponseDTO:
+) -> List[StudentResponseDTO]:
     try:
         repo = StudentRepositoryImpl(db)
         use_case = GetStudentUseCase(repo)
