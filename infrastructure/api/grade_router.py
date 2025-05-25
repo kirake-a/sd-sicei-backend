@@ -10,11 +10,13 @@ from infrastructure.repositories.student_repository_impl import StudentRepositor
 from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
 from infrastructure.mappers.grade_mappers import map_create_grade_dto_to_entity, map_update_grade_dto_to_entity
 from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO
+from infrastructure.schemas.student_schema import StudentResponseDTO
 
 from application.use_cases.grades.create_grade import CreateGradeUseCase
 from application.use_cases.grades.get_grade import GetGradeUseCase
 from application.use_cases.grades.delete_grade import DeleteGradeUseCase
 from application.use_cases.grades.update_grade import UpdateGradeUseCase
+from application.use_cases.students.get_student import GetStudentUseCase
 
 from domain.exceptions.not_enough_arguments_exception import NotEnoughArgumentsException
 from domain.exceptions.cannot_create_exception import CannotCreateException
@@ -59,6 +61,30 @@ async def create_grade(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(e)
         )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+    
+@router.get("/students", status_code=status.HTTP_200_OK, response_model=List[StudentResponseDTO])
+async def get_all_students(
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+) -> List[StudentResponseDTO]:
+    try:
+        repo = StudentRepositoryImpl(db)
+        use_case = GetStudentUseCase(repo)
+        students = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
+        return [StudentResponseDTO.model_validate(student) for student in students]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

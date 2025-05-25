@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from domain.repositories.student_repository import StudentRepository
 from domain.exceptions.resource_not_found_exception import ResourceNotFoundException
 from domain.entities.student import Student
@@ -15,7 +15,7 @@ class GetStudentUseCase:
         
         return student_obtained
     
-    def execute_by_semester(self, students_semester: int) -> list[Student]:
+    def execute_by_semester(self, students_semester: int) -> List[Student]:
         students_obtained = self.repository.get_by_semester(students_semester)
 
         if not students_obtained:

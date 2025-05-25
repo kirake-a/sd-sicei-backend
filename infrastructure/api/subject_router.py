@@ -66,11 +66,11 @@ async def get_subject_by_id(
             detail=UNEXPECTED_ERROR + str(e)
         )
 
-@router.get("/semester/{subjects_semester}", status_code=status.HTTP_200_OK, response_model=SubjectResponseDTO)
-async def get_subject_by_semester(
+@router.get("/semester/{subjects_semester}", status_code=status.HTTP_200_OK, response_model=List[SubjectResponseDTO])
+async def get_subjects_by_semester(
     subjects_semester: int,
     db: Session = Depends(get_db)
-) -> SubjectResponseDTO:
+) -> List[SubjectResponseDTO]:
     try:
         repo = SubjectRepositoryImpl(db)
         use_case = GetSubjectUseCase(repo)
