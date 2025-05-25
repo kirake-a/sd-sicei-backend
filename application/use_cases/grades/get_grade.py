@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from domain.repositories.grade_repository import GradeRepository
-from domain.entities.grade import Grade
+from domain.entities.grade import Grade, GradeToShow
 from domain.exceptions.resource_not_found_exception import ResourceNotFoundException
 
 class GetGradeUseCase:
@@ -45,5 +45,13 @@ class GetGradeUseCase:
         # TO CONSIDER
         if not grades_obtained:
             raise ResourceNotFoundException(f"No grades found for subject with ID '{subject_id}'")
+        
+        return grades_obtained
+    
+    def execute_get_grades_by_student_id(self, student_id: str) -> List[GradeToShow]:
+        grades_obtained = self.repository.get_student_grades_to_show(student_id)
+        
+        if not grades_obtained:
+            raise ResourceNotFoundException(f"No grades found for student with ID '{student_id}'")
         
         return grades_obtained

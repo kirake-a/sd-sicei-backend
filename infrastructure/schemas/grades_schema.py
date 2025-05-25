@@ -24,4 +24,13 @@ class GradeResponseDTO(GradeBaseDTO):
 
     class Config:
         from_attributes = True
+
+class GradeToShowResponseDTO(BaseModel):
+    """DTO for showing a grade"""
+    id: int
+    subject: str
+    value: float = Field(..., ge=0, le=100)
+
+    class Config:
+        from_attributes = True
     
