@@ -9,9 +9,16 @@ from infrastructure.repositories.grade_repository_impl import GradeRepositoryImp
 from infrastructure.repositories.student_repository_impl import StudentRepositoryImpl
 from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
 from infrastructure.mappers.grade_mappers import map_create_grade_dto_to_entity, map_update_grade_dto_to_entity
-from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO, GradeToShowResponseDTO
+from infrastructure.schemas.grades_schema import (
+    CreateGradeDTO,
+    UpdateGradeDTO,
+    GradeResponseDTO,
+    GradeToShowStudentResponseDTO,
+    GradeToShowSubjectResponseDTO
+)
 from infrastructure.schemas.student_schema import StudentResponseDTO
 from infrastructure.schemas.subject_schema import SubjectResponseDTO
+from infrastructure.utils.constants import SORTERS_FIELD, SORTERS_ORDER
 
 from application.use_cases.grades.create_grade import CreateGradeUseCase
 from application.use_cases.grades.get_grade import GetGradeUseCase
@@ -74,8 +81,8 @@ async def get_all_students(
     db: Session = Depends(get_db),
     page_size: Annotated[int, Query(alias="pageSize")] = 25,
     current: Annotated[int, Query(alias="current")] = 1,
-    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
-    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+    sort_field: Optional[str] = Query(default=None, alias=SORTERS_FIELD),
+    sort_order: Optional[str] = Query(default=None, alias=SORTERS_ORDER)
 ) -> List[StudentResponseDTO]:
     try:
         repo = StudentRepositoryImpl(db)
@@ -98,8 +105,8 @@ async def get_all_subjects(
     db: Session = Depends(get_db),
     page_size: Annotated[int, Query(alias="pageSize")] = 25,
     current: Annotated[int, Query(alias="current")] = 1,
-    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
-    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+    sort_field: Optional[str] = Query(default=None, alias=SORTERS_FIELD),
+    sort_order: Optional[str] = Query(default=None, alias=SORTERS_ORDER)
 ) -> List[SubjectResponseDTO]:
     try:
         repo = SubjectRepositoryImpl(db)
@@ -117,15 +124,25 @@ async def get_all_subjects(
             detail=UNEXPECTED_ERROR + str(e)
         )
     
-@router.get("/students/{student_id}", status_code=status.HTTP_200_OK, response_model=List[GradeToShowResponseDTO])
+@router.get("/students/{student_id}", status_code=status.HTTP_200_OK, response_model=List[GradeToShowStudentResponseDTO])
 async def get_student_grades(
     student_id: str,
     db: Session = Depends(get_db),
-) -> List[GradeToShowResponseDTO]:
+) -> List[GradeToShowStudentResponseDTO]:
     repo = GradeRepositoryImpl(db)
     use_case = GetGradeUseCase(repo)
     students = use_case.execute_get_grades_by_student_id(student_id)
-    return [GradeToShowResponseDTO.model_validate(grade) for grade in students]
+    return [GradeToShowStudentResponseDTO.model_validate(grade) for grade in students]
+
+@router.get("/subjects/{subject_id}", status_code=status.HTTP_200_OK, response_model=List[GradeToShowSubjectResponseDTO])
+async def get_subject_grades(
+    subject_id: str,
+    db: Session = Depends(get_db),
+) -> List[GradeToShowSubjectResponseDTO]:
+    repo = GradeRepositoryImpl(db)
+    use_case = GetGradeUseCase(repo)
+    subjects = use_case.execute_get_grades_by_subject_id(subject_id)
+    return [ GradeToShowSubjectResponseDTO.model_validate(grade) for grade in subjects]
 
 @router.get("/{grade_id}", status_code=status.HTTP_200_OK, response_model=GradeResponseDTO)
 async def get_grade_by_id(
@@ -199,8 +216,8 @@ async def get_all_grade(
     db: Session = Depends(get_db),
     page_size: Annotated[int, Query(alias="pageSize")] = 25,
     current: Annotated[int, Query(alias="current")] = 1,
-    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
-    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+    sort_field: Optional[str] = Query(default=None, alias=SORTERS_FIELD),
+    sort_order: Optional[str] = Query(default=None, alias=SORTERS_ORDER)
 ) -> List[GradeResponseDTO]:
     try:
         repo = GradeRepositoryImpl(db)

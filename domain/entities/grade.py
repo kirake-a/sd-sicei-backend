@@ -8,7 +8,13 @@ class Grade:
     value: float
 
 @dataclass
-class GradeToShow:
+class GradeToShowStudent:
     id: int
     subject: str
+    value: float
+
+@dataclass
+class GradeToShowSubject:
+    id: int
+    student: str
     value: float

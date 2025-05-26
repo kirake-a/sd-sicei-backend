@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from typing import List, Optional
 
-from domain.entities.grade import Grade, GradeToShow
+from domain.entities.grade import Grade, GradeToShowStudent, GradeToShowSubject
 
 class GradeRepository(ABC):
     @abstractmethod
@@ -68,8 +68,15 @@ class GradeRepository(ABC):
         pass
 
     @abstractmethod
-    def get_student_grades_to_show(self, student_id: str) -> List[GradeToShow] | None:
+    def get_student_grades_to_show(self, student_id: str) -> List[GradeToShowStudent] | None:
         """
         To get student grades by their ID from the repository.
+        """
+        pass
+
+    @abstractmethod
+    def get_subject_grades_to_show(self, subject_id: str) -> List[GradeToShowSubject] | None:
+        """
+        To get subject grades by their ID from the repository.
         """
         pass
