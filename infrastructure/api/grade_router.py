@@ -11,12 +11,14 @@ from infrastructure.repositories.subject_repository_impl import SubjectRepositor
 from infrastructure.mappers.grade_mappers import map_create_grade_dto_to_entity, map_update_grade_dto_to_entity
 from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO, GradeResponseDTO, GradeToShowResponseDTO
 from infrastructure.schemas.student_schema import StudentResponseDTO
+from infrastructure.schemas.subject_schema import SubjectResponseDTO
 
 from application.use_cases.grades.create_grade import CreateGradeUseCase
 from application.use_cases.grades.get_grade import GetGradeUseCase
 from application.use_cases.grades.delete_grade import DeleteGradeUseCase
 from application.use_cases.grades.update_grade import UpdateGradeUseCase
 from application.use_cases.students.get_student import GetStudentUseCase
+from application.use_cases.subjects.get_subject import GetSubjectUseCase
 
 from domain.exceptions.not_enough_arguments_exception import NotEnoughArgumentsException
 from domain.exceptions.cannot_create_exception import CannotCreateException
@@ -85,6 +87,30 @@ async def get_all_students(
             sort_order=sort_order
         )
         return [StudentResponseDTO.model_validate(student) for student in students]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+    
+@router.get("/subjects", status_code=status.HTTP_200_OK, response_model=List[SubjectResponseDTO])
+async def get_all_subjects(
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+) -> List[SubjectResponseDTO]:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = GetSubjectUseCase(repo)
+        subjects = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
+        return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
