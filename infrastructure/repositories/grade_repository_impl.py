@@ -2,12 +2,12 @@ from sqlalchemy.orm import Session
 
 from typing import List, Optional
 
-from domain.entities.grade import Grade, GradeToShow
+from domain.entities.grade import Grade, GradeToShowStudent, GradeToShowSubject
 from domain.repositories.grade_repository import GradeRepository
 
 from infrastructure.db.models import GradeModel
 from infrastructure.utils.sort_fields import ALLOWED_GRADES_SORT_FIELDS, ALLOWED_SORT_ORDERS
-from infrastructure.mappers.grade_mappers import map_grade_entity_to_model, map_grade_model_to_entity, map_grade_model_to_grade_to_show_dto
+from infrastructure.mappers.grade_mappers import map_grade_entity_to_model, map_grade_model_to_entity, map_grade_model_to_grade_to_show_student_dto
 
 class GradeRepositoryImpl(GradeRepository):
     def __init__(self, db: Session):
@@ -104,7 +104,7 @@ class GradeRepositoryImpl(GradeRepository):
         
         return [map_grade_model_to_entity(grade_model) for grade_model in grade_models]
     
-    def get_student_grades_to_show(self, student_id: str) -> List[GradeToShow] | None:
+    def get_student_grades_to_show(self, student_id: str) -> List[GradeToShowStudent] | None:
         grade_models = (
             self.db.query(GradeModel)
             .filter(GradeModel.student_id == student_id)
@@ -113,4 +113,15 @@ class GradeRepositoryImpl(GradeRepository):
         if not grade_models:
             return None
         
-        return [map_grade_model_to_grade_to_show_dto(grade) for grade in grade_models]
+        return [map_grade_model_to_grade_to_show_student_dto(grade) for grade in grade_models]
+    
+    def get_subject_grades_to_show(self, subject_id: str) -> List[GradeToShowSubject] | None:
+        grade_models = (
+            self.db.query(GradeModel)
+            .filter(GradeModel.subject_id == subject_id)
+            .all())
+
+        if not grade_models:
+            return None
+        
+        return [map_grade_model_to_grade_to_show_student_dto(grade) for grade in grade_models]

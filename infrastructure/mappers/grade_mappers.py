@@ -1,4 +1,4 @@
-from domain.entities.grade import Grade, GradeToShow
+from domain.entities.grade import Grade, GradeToShowStudent, GradeToShowSubject
 
 from infrastructure.schemas.grades_schema import CreateGradeDTO, UpdateGradeDTO
 from infrastructure.db.models import GradeModel
@@ -65,7 +65,7 @@ def map_update_grade_dto_to_entity(grade_id: str, grade_dto: UpdateGradeDTO) -> 
         value=grade_dto.value
     )
 
-def map_grade_model_to_grade_to_show_dto(grade_model: GradeModel) -> GradeToShow:
+def map_grade_model_to_grade_to_show_student_dto(grade_model: GradeModel) -> GradeToShowStudent:
     """
     Maps a GradeModel to a GradeToShow entity.
     
@@ -75,8 +75,24 @@ def map_grade_model_to_grade_to_show_dto(grade_model: GradeModel) -> GradeToShow
     Returns:
         GradeToShow: The mapped entity.
     """
-    return GradeToShow(
+    return GradeToShowStudent(
         id=grade_model.id,
         subject=grade_model.subject.name,
+        value=grade_model.value
+    )
+
+def map_grades_model_to_grades_to_show_subject_dto(grade_model: GradeModel) -> GradeToShowSubject:
+    """
+    Maps a GradeModel to a GradeToShow entity for subject display.
+    
+    Args:
+        grade_model (GradeModel): The model to map.
+        
+    Returns:
+        GradeToShow: The mapped entity.
+    """
+    return GradeToShowSubject(
+        id=grade_model.id,
+        student=grade_model.student.name,
         value=grade_model.value
     )
