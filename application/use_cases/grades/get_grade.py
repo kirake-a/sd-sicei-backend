@@ -49,6 +49,9 @@ class GetGradeUseCase:
         return grades_obtained
     
     def execute_get_grades_by_student_id(self, student_id: str) -> List[GradeToShowStudent]:
+        """
+        Get grades with average for a specific student by their ID.
+        """
         grades_obtained = self.repository.get_student_grades_to_show(student_id)
         
         if not grades_obtained:
@@ -57,6 +60,9 @@ class GetGradeUseCase:
         return grades_obtained
     
     def execute_get_grades_by_subject_id(self, subject_id: str) -> List[GradeToShowSubject]:
+        """
+        Get students with grades for a specific subject by its ID.
+        """
         grades_obtained = self.repository.get_subject_grades_to_show(subject_id)
         
         if not grades_obtained:
