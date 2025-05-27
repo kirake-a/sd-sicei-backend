@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from domain.entities.grade import Grade, GradeToShowStudent, GradeToShowSubject
 from domain.repositories.grade_repository import GradeRepository

@@ -101,4 +101,11 @@ class StudentRepositoryImpl(StudentRepository):
     def exists(self, student_id: str) -> bool:
         student_obtained = self.db.query(StudentModel).filter(StudentModel.id == student_id).first()
         return student_obtained is not None
-        
+    
+    def get_average_by_student_id(self, student_id: str) -> float | None:
+        """To get the average grade of a student by their ID. Implementation"""
+        return (
+            self.db.query(StudentModel.average)
+            .filter(StudentModel.id == student_id)
+            .scalar()
+        )

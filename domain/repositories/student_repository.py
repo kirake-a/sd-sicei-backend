@@ -45,3 +45,8 @@ class StudentRepository(ABC):
     def exists(self, student_id: str) -> bool:
         """To check if a student record exists by its ID."""
         pass
+
+    @abstractmethod
+    def get_average_by_student_id(self, student_id: str) -> float:
+        """To get the average grade of a student by their ID."""
+        pass
