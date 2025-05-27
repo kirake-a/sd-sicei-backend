@@ -80,3 +80,10 @@ class GradeRepository(ABC):
         To get subject grades by their ID from the repository.
         """
         pass
+
+    @abstractmethod
+    def is_regular_student(self, student_id: str) -> bool:
+        """
+        To check if a student is regular based on their grades.
+        """
+        pass

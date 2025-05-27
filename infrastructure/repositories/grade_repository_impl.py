@@ -125,3 +125,15 @@ class GradeRepositoryImpl(GradeRepository):
             return None
         
         return [map_grade_model_to_grade_to_show_subject_dto(grade) for grade in grade_models]
+    
+    def is_regular_student(self, student_id: str) -> bool:
+        grades = self.db.query(GradeModel.value).filter(GradeModel.student_id == student_id).all()
+
+        if not grades:
+            return False
+        
+        for (value,) in grades:
+            if value < 70:
+                return False
+            
+        return True

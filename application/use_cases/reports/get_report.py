@@ -1,6 +1,7 @@
-from typing import Tuple, List
+from typing import Optional, Tuple, List
 
 from domain.entities.grade import GradeToShowStudent, GradeToShowSubject
+from domain.entities.student import StudentReportDashboard
 from domain.exceptions.resource_not_found_exception import ResourceNotFoundException
 from domain.repositories.grade_repository import GradeRepository
 from domain.repositories.student_repository import StudentRepository
@@ -37,4 +38,36 @@ class GetReportUseCase:
         average = value_counter / len(grades_obtained)
 
         return grades_obtained, average
+    
+    def execute_all_students_dashboard(
+        self,
+        page_size: int,
+        page: int,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None
+    ) -> List[StudentReportDashboard]:
+        students_obtained = self.student_repository.get_all(
+            page_size=page_size,
+            page=page,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
         
+        students_dashboard_list: List[StudentReportDashboard] = []
+        for student in students_obtained:
+            student_status = self.grade_repository.is_regular_student(student.id)
+
+            student_for_dashboard = StudentReportDashboard(
+                id=student.id,
+                name=student.name,
+                lastname=student.lastname,
+                email=student.email,
+                semester=student.semester,
+                average=student.average,
+                status=student_status
+            )
+
+            students_dashboard_list.append(student_for_dashboard)
+
+        return students_dashboard_list
+

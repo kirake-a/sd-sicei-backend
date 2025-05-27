@@ -24,3 +24,10 @@ class ReportSubjectsResponseDTO(BaseModel):
 
     class Config:
         from_attributes = True
+
+class StudentsDashboardResponseDTO(StudentWithAverageResponseDTO):
+    """DTO for student dashboard response"""
+    status: bool
+
+    class Config:
+        from_attributes = True
