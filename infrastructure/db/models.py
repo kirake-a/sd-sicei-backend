@@ -14,6 +14,7 @@ class StudentModel(Base):
     lastname = Column(String, nullable=False)
     email = Column(String, nullable=False)
     semester = Column(Integer, nullable=False)
+    average = Column(Float, nullable=False, default=0.0)
 
 class SubjectModel(Base):
     __tablename__ = 'subjects'

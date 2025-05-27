@@ -7,7 +7,7 @@ from domain.repositories.grade_repository import GradeRepository
 
 from infrastructure.db.models import GradeModel
 from infrastructure.utils.sort_fields import ALLOWED_GRADES_SORT_FIELDS, ALLOWED_SORT_ORDERS
-from infrastructure.mappers.grade_mappers import map_grade_entity_to_model, map_grade_model_to_entity, map_grade_model_to_grade_to_show_student_dto
+from infrastructure.mappers.grade_mappers import map_grade_entity_to_model, map_grade_model_to_entity, map_grade_model_to_grade_to_show_student_dto, map_grade_model_to_grade_to_show_subject_dto
 
 class GradeRepositoryImpl(GradeRepository):
     def __init__(self, db: Session):
@@ -124,4 +124,4 @@ class GradeRepositoryImpl(GradeRepository):
         if not grade_models:
             return None
         
-        return [map_grade_model_to_grade_to_show_student_dto(grade) for grade in grade_models]
+        return [map_grade_model_to_grade_to_show_subject_dto(grade) for grade in grade_models]

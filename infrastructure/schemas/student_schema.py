@@ -30,3 +30,10 @@ class StudentResponseDTO(StudentBaseDTO):
 
     class Config:
         from_attributes = True
+
+class StudentWithAverageResponseDTO(StudentResponseDTO):
+    """DTO for student average response"""
+    average: float
+
+    class Config:
+        from_attributes = True

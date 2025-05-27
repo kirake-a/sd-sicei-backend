@@ -7,3 +7,4 @@ class Student:
     lastname: str
     email: str
     semester: int
+    average: float = 0.0
