@@ -142,7 +142,7 @@ async def get_subject_grades(
     repo = GradeRepositoryImpl(db)
     use_case = GetGradeUseCase(repo)
     subjects = use_case.execute_get_grades_by_subject_id(subject_id)
-    return [ GradeToShowSubjectResponseDTO.model_validate(grade) for grade in subjects]
+    return [GradeToShowSubjectResponseDTO.model_validate(grade) for grade in subjects]
 
 @router.get("/{grade_id}", status_code=status.HTTP_200_OK, response_model=GradeResponseDTO)
 async def get_grade_by_id(

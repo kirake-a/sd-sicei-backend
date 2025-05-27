@@ -81,7 +81,7 @@ def map_grade_model_to_grade_to_show_student_dto(grade_model: GradeModel) -> Gra
         value=grade_model.value
     )
 
-def map_grades_model_to_grades_to_show_subject_dto(grade_model: GradeModel) -> GradeToShowSubject:
+def map_grade_model_to_grade_to_show_subject_dto(grade_model: GradeModel) -> GradeToShowSubject:
     """
     Maps a GradeModel to a GradeToShow entity for subject display.
     
