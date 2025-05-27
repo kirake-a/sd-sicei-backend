@@ -75,6 +75,8 @@ class StudentRepositoryImpl(StudentRepository):
             student_model.email = student.email
         if student.semester is not None:
             student_model.semester = student.semester
+        if student.average is not None:
+            student_model.average = student.average
 
         self.db.commit()
         self.db.refresh(student_model)
@@ -84,7 +86,8 @@ class StudentRepositoryImpl(StudentRepository):
             name=student_model.name,
             lastname=student_model.lastname,
             email=student_model.email,
-            semester=student_model.semester
+            semester=student_model.semester,
+            average=student_model.average,
         )
 
     def delete(self, student_id: str) -> bool:

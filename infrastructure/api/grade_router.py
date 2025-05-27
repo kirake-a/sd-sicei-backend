@@ -34,6 +34,7 @@ from domain.exceptions.cannot_update_resource_exception import CannotUpdateResou
 from domain.exceptions.cannot_delete_resource_exception import CannotDeleteResourceException
 from domain.utils.constants import UNEXPECTED_ERROR
 from domain.utils.exception_detail_wrapper import exception_detail_wrapper
+from domain.services.grade_service import GradeService
 
 router = APIRouter(prefix="/grades", tags=["Grades"])
 
@@ -245,8 +246,10 @@ async def update_grade(
     Update a grade by Id
     """
     try:
-        repo = GradeRepositoryImpl(db)
-        use_case = UpdateGradeUseCase(repo)
+        grade_repo = GradeRepositoryImpl(db)
+        student_repo = StudentRepositoryImpl(db)
+        grade_service = GradeService()
+        use_case = UpdateGradeUseCase(grade_repo, student_repo, grade_service)
         grade = use_case.execute(
             map_update_grade_dto_to_entity(grade_id, grade_data)
         )
