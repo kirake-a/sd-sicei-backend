@@ -1,7 +1,6 @@
 from domain.entities.student import Student
 
-from application.schemas.student_schema import CreateStudentDTO, UpdateStudentDTO
-
+from infrastructure.schemas.student_schema import CreateStudentDTO, UpdateStudentDTO
 from infrastructure.db.models import StudentModel
 
 def map_create_student_dto_to_entity(student_dto: CreateStudentDTO) -> Student:

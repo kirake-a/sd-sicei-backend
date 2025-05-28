@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+
+from typing import Annotated, List, Optional
 
 from sqlalchemy.orm import Session
 
-from application.schemas.student_schema import CreateStudentDTO, UpdateStudentDTO, StudentResponseDTO
 from application.use_cases.students.create_student import CreateStudentUseCase
 from application.use_cases.students.get_student import GetStudentUseCase
 from application.use_cases.students.update_student import UpdateStudentUseCase
@@ -15,6 +16,7 @@ from domain.exceptions.cannot_delete_resource_exception import CannotDeleteResou
 from domain.utils.constants import UNEXPECTED_ERROR
 
 from infrastructure.repositories.student_repository_impl import StudentRepositoryImpl
+from infrastructure.schemas.student_schema import CreateStudentDTO, UpdateStudentDTO, StudentResponseDTO
 from infrastructure.mappers.student_mappers import map_create_student_dto_to_entity, map_update_student_dto_to_entity
 from infrastructure.db.database import get_db
 
@@ -31,7 +33,7 @@ async def create_student(
         student = use_case.execute(
             map_create_student_dto_to_entity(student_data)
         )
-        return student
+        return StudentResponseDTO.model_validate(student)
     except CannotCreateException as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -52,7 +54,28 @@ async def get_student_by_id(
         repo = StudentRepositoryImpl(db)
         use_case = GetStudentUseCase(repo)
         student = use_case.execute_by_id(student_id)
-        return student
+        return StudentResponseDTO.model_validate(student)
+    except ResourceNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+    
+@router.get("/semester/{students_semester}", status_code=status.HTTP_200_OK, response_model=List[StudentResponseDTO])
+async def get_students_by_semester(
+    students_semester: int,
+    db: Session = Depends(get_db)
+) -> List[StudentResponseDTO]:
+    try:
+        repo = StudentRepositoryImpl(db)
+        use_case = GetStudentUseCase(repo)
+        students = use_case.execute_by_semester(students_semester)
+        return [StudentResponseDTO.model_validate(student) for student in students]
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -64,20 +87,25 @@ async def get_student_by_id(
             detail=UNEXPECTED_ERROR + str(e)
         )
 
+
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[StudentResponseDTO])
 async def get_all_students(
-    db: Session = Depends(get_db)
-) -> list[StudentResponseDTO]:
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+) -> List[StudentResponseDTO]:
     try:
         repo = StudentRepositoryImpl(db)
         use_case = GetStudentUseCase(repo)
-        students = use_case.execute_all()
-        return students
-    except ResourceNotFoundException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+        students = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
         )
+        return [StudentResponseDTO.model_validate(student) for student in students]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -89,14 +117,14 @@ async def update_student(
     student_id: str,
     student_data: UpdateStudentDTO,
     db: Session = Depends(get_db)
-):
+) -> StudentResponseDTO:
     try:
         repo = StudentRepositoryImpl(db)
         use_case = UpdateStudentUseCase(repo)
         updated_student = use_case.execute(
             map_update_student_dto_to_entity(student_id, student_data)
         )
-        return updated_student
+        return StudentResponseDTO.model_validate(updated_student)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

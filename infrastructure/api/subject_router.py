@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+
+from typing import Annotated, List, Optional
 
 from sqlalchemy.orm import Session
 
-from application.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO, SubjectResponseDTO
 from application.use_cases.subjects.create_subject import CreateSubjectUseCase
 from application.use_cases.subjects.get_subject import GetSubjectUseCase
 from application.use_cases.subjects.update_subject import UpdateSubjectUseCase
@@ -16,6 +17,7 @@ from domain.utils.constants import UNEXPECTED_ERROR
 
 from infrastructure.db.database import get_db
 from infrastructure.repositories.subject_repository_impl import SubjectRepositoryImpl
+from infrastructure.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO, SubjectResponseDTO
 from infrastructure.mappers.subject_mappers import map_create_subject_dto_to_entity, map_update_subject_dto_to_entity
 
 router = APIRouter(prefix="/subjects", tags=["Subjects"])
@@ -31,7 +33,7 @@ async def create_subject(
         subject = use_case.execute(
             map_create_subject_dto_to_entity(subject_data)
         )
-        return subject
+        return SubjectResponseDTO.model_validate(subject)
     except CannotCreateException as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -52,7 +54,7 @@ async def get_subject_by_id(
         repo = SubjectRepositoryImpl(db)
         use_case = GetSubjectUseCase(repo)
         subject = use_case.execute_by_id(subject_id)
-        return subject
+        return SubjectResponseDTO.model_validate(subject)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -64,20 +66,45 @@ async def get_subject_by_id(
             detail=UNEXPECTED_ERROR + str(e)
         )
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[SubjectResponseDTO])
-async def get_all_subjects(
+@router.get("/semester/{subjects_semester}", status_code=status.HTTP_200_OK, response_model=List[SubjectResponseDTO])
+async def get_subjects_by_semester(
+    subjects_semester: int,
     db: Session = Depends(get_db)
-) -> list[SubjectResponseDTO]:
+) -> List[SubjectResponseDTO]:
     try:
         repo = SubjectRepositoryImpl(db)
         use_case = GetSubjectUseCase(repo)
-        subjects = use_case.execute_all()
-        return subjects
+        subjects = use_case.execute_by_semester(subjects_semester)
+        return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=UNEXPECTED_ERROR + str(e)
+        )
+            
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[SubjectResponseDTO])
+async def get_all_subjects(
+    db: Session = Depends(get_db),
+    page_size: Annotated[int, Query(alias="pageSize")] = 25,
+    current: Annotated[int, Query(alias="current")] = 1,
+    sort_field: Optional[str] = Query(default=None, alias="sorters[0][field]"),
+    sort_order: Optional[str] = Query(default=None, alias="sorters[0][order]")
+) -> List[SubjectResponseDTO]:
+    try:
+        repo = SubjectRepositoryImpl(db)
+        use_case = GetSubjectUseCase(repo)
+        subjects = use_case.execute_all(
+            page_size=page_size,
+            page=current,
+            sort_field=sort_field,
+            sort_order=sort_order
+        )
+        return [SubjectResponseDTO.model_validate(subject) for subject in subjects]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -96,7 +123,7 @@ async def update_subject(
         updated_subject = use_case.execute(
             map_update_subject_dto_to_entity(subject_id, subject_data)
         )
-        return updated_subject
+        return SubjectResponseDTO.model_validate(updated_subject)
     except ResourceNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

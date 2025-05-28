@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+
 from typing import Optional
 
 class StudentBaseDTO(BaseModel):
@@ -26,6 +27,13 @@ class UpdateStudentDTO(BaseModel):
 class StudentResponseDTO(StudentBaseDTO):
     """DTO returned in response. Includes the student ID"""
     id: str
+
+    class Config:
+        from_attributes = True
+
+class StudentWithAverageResponseDTO(StudentResponseDTO):
+    """DTO for student average response"""
+    average: float
 
     class Config:
         from_attributes = True

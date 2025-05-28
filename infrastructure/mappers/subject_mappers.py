@@ -1,7 +1,6 @@
 from domain.entities.subject import Subject
 
-from application.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO
-
+from infrastructure.schemas.subject_schema import CreateSubjectDTO, UpdateSubjectDTO
 from infrastructure.db.models import SubjectModel
 
 def map_create_subject_dto_to_entity(subject_dto: CreateSubjectDTO) -> Subject:
